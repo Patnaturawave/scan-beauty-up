@@ -1,0 +1,1222 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="Scan Beauty Up — scanne ton visage, découvre ta saison de couleurs, ton score d'éclat et ton plan beauté personnalisé. Ta photo reste sur ton appareil." />
+    <link rel="icon" href="data:," />
+    <title>Scan Beauty Up</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,800;1,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #fff8f5;
+        --bg-soft: #fdeee9;
+        --surface: #ffffff;
+        --surface-2: #fdf1ec;
+        --ink: #40222f;
+        --ink-soft: #7a5566;
+        --line: #f0d9d2;
+        --rose: #c2437b;
+        --rose-deep: #9c2f60;
+        --rose-soft: #f8dce8;
+        --gold: #b98a44;
+        --gold-soft: #f6e8d2;
+        --sage: #5f7d5a;
+        --shadow: 0 18px 45px rgba(156, 47, 96, 0.13);
+        --radius: 22px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1d1116;
+          --bg-soft: #291720;
+          --surface: #2b1a21;
+          --surface-2: #33202a;
+          --ink: #f7e6ec;
+          --ink-soft: #c9a3b2;
+          --line: #4a2c3a;
+          --rose: #e77cae;
+          --rose-deep: #f09cc0;
+          --rose-soft: #472233;
+          --gold: #ddb26e;
+          --gold-soft: #40331d;
+          --sage: #a9c69f;
+          --shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+        }
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Outfit", system-ui, sans-serif;
+        font-size: 17px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+      h1, h2, h3, .serif { font-family: "Playfair Display", Georgia, serif; }
+      img { max-width: 100%; display: block; }
+      button { font-family: inherit; cursor: pointer; }
+      .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px; }
+
+      /* ---------- screens ---------- */
+      .screen { display: none; }
+      .screen.on { display: block; animation: fadein .45s ease both; }
+      @keyframes fadein { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+      @media (prefers-reduced-motion: reduce) {
+        .screen.on { animation: none; }
+        html { scroll-behavior: auto; }
+      }
+
+      /* ---------- hero ---------- */
+      .hero {
+        display: grid; grid-template-columns: 1.05fr .95fr; gap: 44px;
+        align-items: center; padding: 52px 0 30px;
+      }
+      .hero-kicker {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: var(--rose-soft); color: var(--rose-deep);
+        font-size: .82rem; font-weight: 600; letter-spacing: .04em;
+        padding: 7px 14px; border-radius: 999px; margin-bottom: 20px;
+      }
+      .hero h1 { font-size: clamp(2.3rem, 5.4vw, 3.6rem); line-height: 1.06; margin: 0 0 18px; font-weight: 800; }
+      .hero h1 em { font-style: italic; color: var(--rose); }
+      .hero p.lead { font-size: 1.13rem; color: var(--ink-soft); margin: 0 0 26px; max-width: 34rem; }
+      .hero-photo {
+        border-radius: 190px 190px var(--radius) var(--radius);
+        overflow: hidden; box-shadow: var(--shadow); aspect-ratio: 4/5.1;
+      }
+      .hero-photo img { width: 100%; height: 100%; object-fit: cover; }
+      .trust-row { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 22px; color: var(--ink-soft); font-size: .93rem; }
+      .trust-row span { display: inline-flex; gap: 7px; align-items: center; }
+      .trust-row svg { flex: none; }
+
+      .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+        background: var(--rose); color: #fff; border: none;
+        font-size: 1.05rem; font-weight: 600; padding: 16px 30px; border-radius: 999px;
+        box-shadow: 0 12px 26px rgba(194, 67, 123, .32); transition: transform .15s ease, background .15s ease;
+        text-decoration: none;
+      }
+      .btn:hover { background: var(--rose-deep); transform: translateY(-1px); }
+      .btn.gold { background: var(--gold); box-shadow: 0 12px 26px rgba(185, 138, 68, .3); }
+      .btn.ghost { background: transparent; color: var(--rose-deep); box-shadow: none; border: 1.5px solid var(--line); }
+      .btn.small { padding: 11px 20px; font-size: .95rem; }
+      .btn[disabled] { opacity: .55; cursor: not-allowed; transform: none; }
+
+      /* ---------- how it works ---------- */
+      .section { padding: 44px 0; }
+      .section h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); margin: 0 0 8px; }
+      .section .sub { color: var(--ink-soft); margin: 0 0 26px; max-width: 40rem; }
+      .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+      .step-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+      .step-num {
+        width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+        background: var(--rose-soft); color: var(--rose-deep); font-family: "Playfair Display", serif;
+        font-weight: 700; font-size: 1.15rem; margin-bottom: 14px;
+      }
+      .step-card h3 { margin: 0 0 6px; font-size: 1.12rem; }
+      .step-card p { margin: 0; color: var(--ink-soft); font-size: .96rem; }
+
+      .deliver { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+      .deliver-card { background: var(--surface-2); border-radius: var(--radius); padding: 22px 24px; display: flex; gap: 16px; }
+      .deliver-card .ic { flex: none; width: 46px; height: 46px; border-radius: 14px; background: var(--surface); display: grid; place-items: center; box-shadow: 0 4px 12px rgba(0,0,0,.05); }
+      .deliver-card h3 { margin: 2px 0 4px; font-size: 1.05rem; }
+      .deliver-card p { margin: 0; color: var(--ink-soft); font-size: .94rem; }
+      .tag-free, .tag-premium { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; vertical-align: middle; margin-left: 8px; }
+      .tag-free { background: #e3efdd; color: #3d6034; }
+      .tag-premium { background: var(--gold-soft); color: var(--gold); }
+      @media (prefers-color-scheme: dark) { .tag-free { background: #2c4023; color: #b7d9a8; } }
+
+      /* ---------- flow chrome ---------- */
+      .flow-head { padding: 30px 0 6px; }
+      .progress { height: 8px; background: var(--bg-soft); border-radius: 99px; overflow: hidden; margin: 14px 0 6px; }
+      .progress i { display: block; height: 100%; background: var(--rose); border-radius: 99px; transition: width .4s ease; width: 0; }
+      .flow-step-label { color: var(--ink-soft); font-size: .9rem; }
+      .back-link { background: none; border: none; color: var(--ink-soft); font-size: .95rem; padding: 6px 0; display: inline-flex; gap: 6px; align-items: center; }
+      .back-link:hover { color: var(--rose-deep); }
+      .flow h2 { font-size: clamp(1.55rem, 3.6vw, 2.1rem); margin: 10px 0 8px; }
+      .flow .sub { color: var(--ink-soft); margin: 0 0 24px; max-width: 36rem; }
+
+      /* ---------- photo step ---------- */
+      .drop {
+        border: 2px dashed var(--line); border-radius: var(--radius); background: var(--surface);
+        padding: 30px 22px; text-align: center;
+      }
+      .drop.has-photo { border-style: solid; padding: 16px; }
+      .drop .preview { max-width: 300px; margin: 0 auto 14px; border-radius: 16px; overflow: hidden; }
+      .drop .preview img { width: 100%; height: auto; }
+      .photo-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 16px; }
+      .privacy-note {
+        display: flex; gap: 12px; background: var(--bg-soft); border-radius: 16px; padding: 16px 18px; margin-top: 18px;
+        font-size: .94rem; color: var(--ink-soft); text-align: left;
+      }
+      .privacy-note svg { flex: none; margin-top: 2px; }
+      .privacy-note strong { color: var(--ink); }
+
+      /* ---------- quiz ---------- */
+      .q-block { margin-bottom: 30px; }
+      .q-block h3 { font-family: "Outfit", sans-serif; font-size: 1.08rem; font-weight: 600; margin: 0 0 12px; }
+      .opts { display: flex; flex-wrap: wrap; gap: 10px; }
+      .opt {
+        border: 1.5px solid var(--line); background: var(--surface); color: var(--ink);
+        border-radius: 999px; padding: 11px 18px; font-size: .98rem; font-weight: 500;
+        display: inline-flex; align-items: center; gap: 9px; transition: border-color .15s, background .15s;
+      }
+      .opt:hover { border-color: var(--rose); }
+      .opt.sel { border-color: var(--rose); background: var(--rose-soft); color: var(--rose-deep); font-weight: 600; }
+      .opt .dot { width: 20px; height: 20px; border-radius: 50%; flex: none; border: 1px solid rgba(0,0,0,.14); }
+      .quiz-error { color: var(--rose-deep); font-weight: 600; display: none; margin: 4px 0 14px; }
+
+      /* ---------- analyzing ---------- */
+      .analyzing { text-align: center; padding: 70px 0 90px; }
+      .scan-frame {
+        width: 190px; height: 190px; margin: 0 auto 28px; border-radius: 50%;
+        border: 2px solid var(--rose-soft); position: relative; overflow: hidden; background: var(--surface);
+        display: grid; place-items: center;
+      }
+      .scan-frame img { width: 100%; height: 100%; object-fit: cover; }
+      .scan-line {
+        position: absolute; left: 0; right: 0; height: 34px;
+        background: linear-gradient(180deg, transparent, rgba(194,67,123,.35), transparent);
+        animation: scanmove 1.6s ease-in-out infinite alternate;
+      }
+      @keyframes scanmove { from { top: -8%; } to { top: 82%; } }
+      @media (prefers-reduced-motion: reduce) { .scan-line { animation: none; top: 40%; } }
+      .analyzing ul { list-style: none; padding: 0; margin: 22px auto 0; max-width: 340px; text-align: left; }
+      .analyzing li { padding: 7px 0; color: var(--ink-soft); display: flex; gap: 10px; align-items: center; opacity: .35; transition: opacity .3s; }
+      .analyzing li.done { opacity: 1; color: var(--ink); }
+      .analyzing li .tick { width: 22px; height: 22px; border-radius: 50%; background: var(--rose-soft); color: var(--rose-deep); display: grid; place-items: center; font-size: .8rem; flex: none; }
+
+      /* ---------- results ---------- */
+      .results-head { text-align: center; padding: 38px 0 6px; }
+      .results-head h2 { font-size: clamp(1.8rem, 4.4vw, 2.6rem); margin: 0 0 6px; }
+      .results-head p { color: var(--ink-soft); margin: 0; }
+      .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 26px; }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; box-shadow: 0 6px 22px rgba(64,34,47,.05); }
+      .card h3 { margin: 0 0 4px; font-size: 1.25rem; }
+      .card .card-sub { color: var(--ink-soft); font-size: .93rem; margin: 0 0 16px; }
+      .card.wide { grid-column: 1 / -1; }
+
+      .gauge-wrap { display: flex; align-items: center; gap: 22px; }
+      .gauge { position: relative; width: 138px; height: 138px; flex: none; }
+      .gauge svg { transform: rotate(-90deg); }
+      .gauge .g-num { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+      .gauge .g-num b { font-family: "Playfair Display", serif; font-size: 2.3rem; line-height: 1; display: block; }
+      .gauge .g-num span { font-size: .78rem; color: var(--ink-soft); }
+      .bars { flex: 1; min-width: 180px; }
+      .bar-row { margin-bottom: 12px; }
+      .bar-row .bar-top { display: flex; justify-content: space-between; font-size: .9rem; margin-bottom: 5px; }
+      .bar-row .bar-top span:last-child { font-weight: 700; }
+      .bar { height: 8px; background: var(--bg-soft); border-radius: 99px; overflow: hidden; }
+      .bar i { display: block; height: 100%; background: var(--rose); border-radius: 99px; width: 0; transition: width 1s ease .2s; }
+
+      .season-name { font-family: "Playfair Display", serif; font-size: 1.9rem; font-weight: 800; color: var(--rose-deep); margin: 2px 0 8px; }
+      .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0 6px; }
+      .sw { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+      .sw i { display: block; height: 44px; }
+      .sw span { display: block; font-size: .72rem; padding: 5px 7px; background: var(--surface); color: var(--ink-soft); line-height: 1.25; }
+      .avoid-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+      .avoid-list .av { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px 5px 6px; font-size: .86rem; color: var(--ink-soft); }
+      .avoid-list .av i { width: 18px; height: 18px; border-radius: 50%; display: block; }
+      .mini-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+      .mini-fact { background: var(--surface-2); border-radius: 14px; padding: 12px 14px; font-size: .9rem; }
+      .mini-fact b { display: block; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); margin-bottom: 2px; }
+
+      .face-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+      .face-stat { background: var(--surface-2); border-radius: 14px; padding: 14px; text-align: center; }
+      .face-stat b { font-family: "Playfair Display", serif; font-size: 1.5rem; display: block; }
+      .face-stat span { font-size: .8rem; color: var(--ink-soft); }
+      .tick-list { list-style: none; padding: 0; margin: 0; }
+      .tick-list li { padding: 7px 0 7px 30px; position: relative; }
+      .tick-list li::before {
+        content: "✓"; position: absolute; left: 0; top: 7px; width: 21px; height: 21px; border-radius: 50%;
+        background: var(--rose-soft); color: var(--rose-deep); font-size: .78rem; display: grid; place-items: center; font-weight: 700;
+      }
+
+      /* plan steps */
+      .plan-steps { list-style: none; counter-reset: plan; padding: 0; margin: 0; }
+      .plan-steps li { display: flex; gap: 16px; padding: 15px 0; border-bottom: 1px solid var(--line); }
+      .plan-steps li:last-child { border-bottom: none; }
+      .plan-steps .n {
+        counter-increment: plan; flex: none; width: 38px; height: 38px; border-radius: 50%;
+        background: var(--rose); color: #fff; display: grid; place-items: center; font-weight: 700;
+        font-family: "Playfair Display", serif;
+      }
+      .plan-steps h4 { margin: 4px 0 3px; font-size: 1.02rem; }
+      .plan-steps p { margin: 0; color: var(--ink-soft); font-size: .94rem; }
+
+      /* ---------- premium ---------- */
+      .premium-card {
+        position: relative; border-radius: var(--radius); overflow: hidden;
+        border: 1.5px solid var(--gold); background: var(--surface); margin-top: 18px;
+        box-shadow: var(--shadow);
+      }
+      .premium-inner { padding: 28px; }
+      .premium-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px; margin-bottom: 6px; }
+      .premium-head h3 { font-size: 1.5rem; margin: 0; }
+      .price { font-family: "Playfair Display", serif; font-size: 1.7rem; font-weight: 800; color: var(--gold); }
+      .price small { font-family: "Outfit", sans-serif; font-size: .85rem; font-weight: 500; color: var(--ink-soft); }
+      .locked-zone { position: relative; margin-top: 18px; }
+      .locked-content { filter: blur(7px); pointer-events: none; user-select: none; }
+      .locked-veil {
+        position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; padding: 22px; gap: 6px;
+      }
+      .locked-veil .lock-ic { width: 52px; height: 52px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow); display: grid; place-items: center; margin-bottom: 6px; }
+      .unlocked .locked-content { filter: none; pointer-events: auto; user-select: auto; }
+      .unlocked .locked-veil { display: none; }
+      .pay-note { font-size: .9rem; color: var(--ink-soft); margin-top: 12px; text-align: center; }
+      .code-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 14px; }
+      .code-row input {
+        font: inherit; padding: 12px 16px; border-radius: 999px; border: 1.5px solid var(--line);
+        background: var(--surface); color: var(--ink); min-width: 210px; text-transform: uppercase;
+      }
+      .code-msg { font-size: .92rem; margin-top: 10px; text-align: center; min-height: 1.4em; }
+      .preview-link { background: none; border: none; color: var(--ink-soft); text-decoration: underline; font-size: .88rem; margin-top: 6px; }
+
+      .routine-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+      .routine-table td { padding: 9px 6px; border-bottom: 1px solid var(--line); font-size: .96rem; vertical-align: top; }
+      .routine-table td:first-child { font-weight: 700; color: var(--rose-deep); white-space: nowrap; width: 86px; }
+      .routine-table tr:last-child td { border-bottom: none; }
+
+      .products { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 8px; }
+      .product { background: var(--surface-2); border-radius: 16px; padding: 18px; }
+      .product .p-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--surface); display: grid; place-items: center; margin-bottom: 10px; }
+      .product h4 { margin: 0 0 4px; font-size: .99rem; }
+      .product p { margin: 0 0 12px; font-size: .88rem; color: var(--ink-soft); }
+      .aff-chip { font-size: .8rem; font-weight: 600; color: var(--ink-soft); border: 1px dashed var(--line); border-radius: 999px; padding: 6px 12px; display: inline-block; background: var(--surface); }
+
+      .results-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 30px 0 8px; }
+
+      /* ---------- footer / legal ---------- */
+      footer { border-top: 1px solid var(--line); margin-top: 40px; padding: 30px 0 46px; color: var(--ink-soft); font-size: .92rem; }
+      .foot-links { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 14px; }
+      .foot-links button { background: none; border: none; padding: 0; color: var(--ink-soft); font-size: .92rem; text-decoration: underline; }
+      .foot-links a { color: var(--ink-soft); }
+      .legal-panel { display: none; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 26px; margin: 0 0 26px; color: var(--ink); }
+      .legal-panel.on { display: block; }
+      .legal-panel h3 { margin-top: 0; }
+      .legal-panel p, .legal-panel li { font-size: .95rem; color: var(--ink-soft); }
+      .disclaimer { font-size: .85rem; color: var(--ink-soft); border-top: 1px dashed var(--line); padding-top: 14px; margin-top: 8px; }
+
+      @media (max-width: 820px) {
+        .hero { grid-template-columns: 1fr; padding-top: 30px; gap: 26px; }
+        .hero-photo { max-width: 340px; margin: 0 auto; width: 100%; }
+        .steps, .deliver, .result-grid, .products { grid-template-columns: 1fr; }
+        .gauge-wrap { flex-direction: column; text-align: center; }
+        .swatches { grid-template-columns: repeat(4, 1fr); }
+        .face-stats { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .mini-facts { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+
+  <!-- ================= HOME ================= -->
+  <main id="screen-home" class="screen on">
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <span class="hero-kicker">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>
+            Ton analyse beauté personnalisée
+          </span>
+          <h1>Découvre ta <em>saison de couleurs</em> et réveille ton éclat</h1>
+          <p class="lead">Un selfie, quelques questions, et tu repars avec ton score d'éclat, ta palette de couleurs idéale, l'analyse de ton visage et les premières étapes de ton plan beauté — en 5 minutes, gratuitement.</p>
+          <button class="btn" id="cta-start" type="button">Commencer mon scan gratuit
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <div class="trust-row">
+            <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Ta photo reste sur ton appareil</span>
+            <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> 5 minutes chrono</span>
+            <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Sans compte, sans e-mail</span>
+          </div>
+        </div>
+        <div class="hero-photo">
+          <img src="assets/hero.webp" alt="Portrait d'une jeune femme à la peau lumineuse, maquillage naturel, sur fond rose poudré" />
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Comment ça marche</h2>
+        <p class="sub">Trois étapes, aucun compte à créer. L'analyse de ta photo se fait directement dans ton navigateur : elle n'est ni envoyée, ni conservée.</p>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <h3>Envoie ton selfie</h3>
+            <p>Une photo de face, à la lumière du jour, sans filtre. Elle est analysée sur ton appareil pour lire la tonalité et la luminosité de ta peau.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <h3>Réponds à 8 questions</h3>
+            <p>Teint, sous-ton, cheveux, yeux, bijoux qui te vont le mieux… C'est ce qui permet de déterminer ta saison de couleurs avec précision.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <h3>Reçois tes résultats</h3>
+            <p>Score d'éclat, saison, palette idéale, analyse du visage et plan d'action. Le plan complet et la routine détaillée se débloquent en premium.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" style="padding-top:6px">
+        <h2>Ce que tu obtiens</h2>
+        <p class="sub">Le scan gratuit te donne l'essentiel. Le plan complet va plus loin : chaque étape détaillée, ta routine maquillage minutée et les produits adaptés à ta saison.</p>
+        <div class="deliver">
+          <div class="deliver-card">
+            <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c2437b" stroke-width="2"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg></div>
+            <div>
+              <h3>Score d'éclat<span class="tag-free">Gratuit</span></h3>
+              <p>Une note sur 100 avec le détail : luminosité, homogénéité du teint et harmonie de tes couleurs.</p>
+            </div>
+          </div>
+          <div class="deliver-card">
+            <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c2437b" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1.4" fill="#c2437b"/><circle cx="15" cy="8.5" r="1.4" fill="#b98a44"/><circle cx="15.5" cy="14.5" r="1.4" fill="#5f7d5a"/><circle cx="9" cy="15.5" r="1.4" fill="#7a4a63"/></svg></div>
+            <div>
+              <h3>Ta saison de couleurs<span class="tag-free">Gratuit</span></h3>
+              <p>Printemps, Été, Automne ou Hiver : ta palette idéale pour le maquillage et les vêtements, et les teintes qui te desservent.</p>
+            </div>
+          </div>
+          <div class="deliver-card">
+            <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c2437b" stroke-width="2"><circle cx="12" cy="10" r="6"/><path d="M12 2v2M4.9 4.9l1.4 1.4M19.1 4.9l-1.4 1.4M5 21c1.5-3 4-4.5 7-4.5s5.5 1.5 7 4.5"/></svg></div>
+            <div>
+              <h3>Analyse de ton visage<span class="tag-free">Gratuit</span></h3>
+              <p>Ce que ta photo révèle : éclat, zones à travailler et tes points forts naturels à mettre en avant.</p>
+            </div>
+          </div>
+          <div class="deliver-card">
+            <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b98a44" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+            <div>
+              <h3>Plan complet + routine minutée<span class="tag-premium">Premium</span></h3>
+              <p>Les 5 étapes détaillées jour par jour, ta routine maquillage chronométrée selon le temps que tu as, et la sélection de produits pour ta saison.</p>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:30px">
+          <button class="btn" id="cta-start-2" type="button">Faire mon scan gratuit</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ================= PHOTO ================= -->
+  <main id="screen-photo" class="screen">
+    <div class="wrap flow">
+      <div class="flow-head">
+        <button class="back-link" type="button" data-back="home">← Retour</button>
+        <div class="progress"><i id="prog-photo"></i></div>
+        <span class="flow-step-label">Étape 1 sur 3 — Ta photo</span>
+      </div>
+      <h2>Envoie ton selfie</h2>
+      <p class="sub">De face, à la lumière du jour, sans filtre ni maquillage appuyé si possible. Plus la photo est nette, plus l'analyse de ta tonalité est juste.</p>
+
+      <div class="drop" id="drop">
+        <div id="drop-empty">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#c2437b" stroke-width="1.5" style="margin:0 auto 12px"><rect x="3" y="7" width="18" height="13" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8.5 7l1.2-2.5h4.6L15.5 7"/></svg>
+          <p style="margin:0 0 6px;font-weight:600">Choisis une photo de ton visage</p>
+          <p style="margin:0;color:var(--ink-soft);font-size:.94rem">JPG ou PNG, prise à la lumière naturelle de préférence.</p>
+        </div>
+        <div class="preview" id="preview" hidden><img id="preview-img" alt="Aperçu de ton selfie" /></div>
+        <div class="photo-actions">
+          <label class="btn small" for="file-input" style="margin:0">Choisir une photo</label>
+          <input type="file" id="file-input" accept="image/*" hidden />
+          <button class="btn ghost small" id="btn-nophoto" type="button">Continuer sans photo</button>
+        </div>
+        <p id="photo-status" style="margin:14px 0 0;color:var(--ink-soft);font-size:.92rem"></p>
+      </div>
+
+      <div class="privacy-note">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c2437b" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        <div><strong>Ta photo ne quitte pas ton appareil.</strong> L'analyse des couleurs se fait ici même, dans ton navigateur. Rien n'est envoyé sur un serveur, rien n'est conservé : quand tu fermes la page, tout disparaît.</div>
+      </div>
+
+      <div style="margin-top:24px;text-align:right">
+        <button class="btn" id="btn-toquiz" type="button" disabled>Continuer vers les questions</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= QUIZ ================= -->
+  <main id="screen-quiz" class="screen">
+    <div class="wrap flow">
+      <div class="flow-head">
+        <button class="back-link" type="button" data-back="photo">← Retour</button>
+        <div class="progress"><i id="prog-quiz"></i></div>
+        <span class="flow-step-label">Étape 2 sur 3 — Tes réponses</span>
+      </div>
+      <h2>Parle-moi de toi</h2>
+      <p class="sub">Huit questions rapides. Réponds selon tes couleurs <em>naturelles</em> (cheveux non teints, peau sans autobronzant) : c'est ce qui rend la saison fiable.</p>
+      <div id="quiz-body"></div>
+      <p class="quiz-error" id="quiz-error">Il manque encore quelques réponses pour lancer l'analyse.</p>
+      <div style="text-align:right;padding-bottom:20px">
+        <button class="btn" id="btn-analyze" type="button">Lancer mon analyse
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= ANALYZING ================= -->
+  <main id="screen-analyzing" class="screen">
+    <div class="wrap analyzing">
+      <div class="scan-frame">
+        <img id="scan-img" alt="" hidden />
+        <svg id="scan-placeholder" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#c2437b" stroke-width="1.3"><circle cx="12" cy="9" r="5.5"/><path d="M4.5 20.5c1.8-3.6 4.4-5.4 7.5-5.4s5.7 1.8 7.5 5.4"/></svg>
+        <div class="scan-line"></div>
+      </div>
+      <h2 class="serif" style="font-size:1.8rem;margin:0">Analyse en cours…</h2>
+      <ul id="analyze-steps">
+        <li><span class="tick">✓</span> Lecture de la tonalité de ta peau</li>
+        <li><span class="tick">✓</span> Croisement avec tes réponses</li>
+        <li><span class="tick">✓</span> Détermination de ta saison de couleurs</li>
+        <li><span class="tick">✓</span> Construction de ton plan personnalisé</li>
+      </ul>
+    </div>
+  </main>
+
+  <!-- ================= RESULTS ================= -->
+  <main id="screen-results" class="screen">
+    <div class="wrap">
+      <div class="results-head">
+        <span class="hero-kicker">Ton analyse est prête</span>
+        <h2>Voici ce que ton scan révèle</h2>
+        <p id="results-intro">Basé sur ta photo et tes réponses.</p>
+      </div>
+
+      <div class="result-grid">
+        <!-- Score -->
+        <section class="card">
+          <h3>Ton score d'éclat</h3>
+          <p class="card-sub" id="score-verdict">—</p>
+          <div class="gauge-wrap">
+            <div class="gauge">
+              <svg width="138" height="138" viewBox="0 0 138 138">
+                <circle cx="69" cy="69" r="58" fill="none" stroke="var(--bg-soft)" stroke-width="13"/>
+                <circle id="gauge-arc" cx="69" cy="69" r="58" fill="none" stroke="var(--rose)" stroke-width="13" stroke-linecap="round" stroke-dasharray="364.4" stroke-dashoffset="364.4" style="transition:stroke-dashoffset 1.2s ease .2s"/>
+              </svg>
+              <div class="g-num"><div><b id="score-num">0</b><span>sur 100</span></div></div>
+            </div>
+            <div class="bars" id="score-bars"></div>
+          </div>
+          <p style="font-size:.88rem;color:var(--ink-soft);margin:16px 0 0" id="score-note"></p>
+        </section>
+
+        <!-- Saison -->
+        <section class="card">
+          <h3>Ta saison de couleurs</h3>
+          <p class="card-sub">La famille de teintes qui harmonise naturellement ton visage.</p>
+          <div class="season-name" id="season-name">—</div>
+          <p id="season-desc" style="margin:0;color:var(--ink-soft);font-size:.96rem">—</p>
+          <div class="swatches" id="season-swatches"></div>
+          <p style="font-weight:600;margin:14px 0 0;font-size:.95rem">Les teintes qui te desservent</p>
+          <div class="avoid-list" id="season-avoid"></div>
+          <div class="mini-facts">
+            <div class="mini-fact"><b>Bijoux idéaux</b><span id="fact-metal">—</span></div>
+            <div class="mini-fact"><b>Sous-ton</b><span id="fact-undertone">—</span></div>
+          </div>
+        </section>
+
+        <!-- Visage -->
+        <section class="card wide">
+          <h3>L'analyse de ton visage</h3>
+          <p class="card-sub" id="face-sub">Ce que ta photo révèle, point par point.</p>
+          <div class="face-stats" id="face-stats"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 30px" class="face-cols">
+            <div>
+              <p style="font-weight:600;margin:0 0 4px">Tes points forts</p>
+              <ul class="tick-list" id="face-strengths"></ul>
+            </div>
+            <div>
+              <p style="font-weight:600;margin:0 0 4px">À travailler en priorité</p>
+              <ul class="tick-list" id="face-focus"></ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Plan gratuit -->
+        <section class="card wide">
+          <h3>Ton plan éclat en 5 étapes</h3>
+          <p class="card-sub">L'aperçu gratuit : les deux premières étapes en détail. La suite fait partie du plan complet.</p>
+          <ol class="plan-steps" id="plan-free"></ol>
+        </section>
+      </div>
+
+      <!-- ================= PREMIUM ================= -->
+      <section class="premium-card" id="premium-card">
+        <div class="premium-inner">
+          <div class="premium-head">
+            <h3>Ton plan Beauty Up complet</h3>
+            <span class="price">9,90&nbsp;€ <small>paiement unique, sans abonnement</small></span>
+          </div>
+          <p style="color:var(--ink-soft);margin:0">Les 5 étapes détaillées jour par jour, ta routine maquillage minutée selon le temps que tu as le matin, et la sélection de produits pensée pour ta saison — à garder pour toujours.</p>
+
+          <div class="locked-zone" id="locked-zone">
+            <div class="locked-content" id="premium-content" aria-hidden="true">
+              <h3 class="serif" style="font-size:1.2rem;margin:20px 0 4px">Les 5 étapes, en détail</h3>
+              <ol class="plan-steps" id="plan-full"></ol>
+              <h3 class="serif" style="font-size:1.2rem;margin:26px 0 4px">Ta routine maquillage minutée</h3>
+              <p style="color:var(--ink-soft);font-size:.94rem;margin:0 0 6px" id="routine-intro"></p>
+              <table class="routine-table"><tbody id="routine-body"></tbody></table>
+              <h3 class="serif" style="font-size:1.2rem;margin:26px 0 4px">La sélection pour ta saison</h3>
+              <p style="color:var(--ink-soft);font-size:.94rem;margin:0">Trois essentiels choisis pour ton sous-ton. Les liens d'achat affiliés arrivent avec l'ouverture de la boutique.</p>
+              <div class="products" id="products"></div>
+            </div>
+            <div class="locked-veil" id="locked-veil">
+              <div class="lock-ic">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b98a44" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1.6" fill="#b98a44"/></svg>
+              </div>
+              <p style="font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;margin:0">La suite de ton plan t'attend</p>
+              <p style="color:var(--ink-soft);margin:0;max-width:26rem;font-size:.95rem">Étapes 3 à 5 détaillées, routine minutée et sélection produits pour ta saison <strong id="veil-season"></strong>.</p>
+              <button class="btn gold" id="btn-buy" type="button" style="margin-top:12px">Débloquer mon plan complet — 9,90&nbsp;€</button>
+            </div>
+          </div>
+
+          <p class="pay-note" id="pay-note">Paiement sécurisé par carte via Gumroad. Après ton achat, tu reçois un code : saisis-le ci-dessous pour débloquer ton plan sur cet appareil.</p>
+          <div class="code-row">
+            <input type="text" id="code-input" placeholder="Ton code d'accès" autocomplete="off" />
+            <button class="btn ghost small" id="btn-code" type="button">Débloquer avec un code</button>
+          </div>
+          <p class="code-msg" id="code-msg"></p>
+          <div style="text-align:center">
+            <button class="preview-link" id="btn-preview" type="button">Aperçu de test — voir le contenu premium (mode démo)</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="results-actions">
+        <button class="btn ghost" id="btn-download" type="button">Télécharger mon résumé</button>
+        <button class="btn ghost" id="btn-restart" type="button">Refaire un scan</button>
+      </div>
+      <p style="text-align:center;color:var(--ink-soft);font-size:.9rem">Suis le lancement et les coulisses sur TikTok : <a href="https://www.tiktok.com/@scanbeautyup" target="_blank" rel="noopener" style="color:var(--rose-deep);font-weight:600">@scanbeautyup</a></p>
+    </div>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="wrap">
+      <div class="legal-panel" id="panel-privacy">
+        <h3>Politique de confidentialité</h3>
+        <p><strong>Ta photo ne quitte jamais ton appareil.</strong> L'analyse des couleurs de l'image (tonalité, luminosité, homogénéité) est calculée localement, dans ton navigateur. Aucune image n'est envoyée à un serveur, stockée, ni partagée.</p>
+        <p>Les réponses au questionnaire servent uniquement à calculer tes résultats pendant ta visite. Ce site n'utilise ni compte utilisateur, ni cookie de suivi, ni outil de mesure d'audience. Si tu fermes la page, les données de ton scan disparaissent.</p>
+        <p>Le paiement du plan complet est traité par Gumroad, qui agit comme vendeur et responsable du traitement pour la transaction (carte bancaire, reçu, TVA). Scan Beauty Up ne voit ni ne conserve tes coordonnées bancaires.</p>
+        <p>Pour toute question sur tes données : contacte-nous via le compte TikTok <a href="https://www.tiktok.com/@scanbeautyup" target="_blank" rel="noopener">@scanbeautyup</a>.</p>
+      </div>
+      <div class="legal-panel" id="panel-legal">
+        <h3>Mentions légales</h3>
+        <p>Scan Beauty Up est un service de conseils beauté personnalisés édité par le créateur du compte TikTok <a href="https://www.tiktok.com/@scanbeautyup" target="_blank" rel="noopener">@scanbeautyup</a>. Les informations complètes de l'éditeur (identité, adresse, immatriculation) seront publiées ici avant l'ouverture des ventes, conformément aux obligations légales.</p>
+        <p>Le plan complet est vendu via la plateforme Gumroad, qui assure l'encaissement, la facturation et la gestion de la TVA. Les conditions de vente et de remboursement applicables sont celles présentées sur la page de paiement Gumroad au moment de l'achat.</p>
+        <p>Certains liens produits présents dans le plan complet sont des liens affiliés : ils peuvent générer une commission pour Scan Beauty Up, sans coût supplémentaire pour toi. Ils sont signalés comme tels.</p>
+      </div>
+      <div class="foot-links">
+        <button type="button" data-legal="panel-privacy">Politique de confidentialité</button>
+        <button type="button" data-legal="panel-legal">Mentions légales</button>
+        <a href="https://www.tiktok.com/@scanbeautyup" target="_blank" rel="noopener">TikTok @scanbeautyup</a>
+      </div>
+      <p style="margin:0">Scan Beauty Up — ton analyse couleurs et ton plan éclat, en 5 minutes.</p>
+      <p class="disclaimer">Les résultats de cette analyse sont des conseils esthétiques générés à partir de ta photo et de tes réponses. Ils ne constituent ni un diagnostic, ni un avis médical ou dermatologique. En cas de problème de peau, consulte un professionnel de santé.</p>
+    </div>
+  </footer>
+
+  <script>
+  "use strict";
+  /* =====================================================================
+     CONFIGURATION À BRANCHER LE JOUR DE LA MISE EN VENTE
+     - GUMROAD_URL : colle ici le lien du produit Gumroad « Plan Beauty Up
+       complet » (ex. https://toncompte.gumroad.com/l/beautyup). Tant qu'il
+       est vide, le bouton d'achat affiche un message « ventes bientôt ».
+     - ACCESS_CODES : les codes d'accès envoyés aux acheteuses via Gumroad
+       (à remplir avec les codes générés dans Gumroad > produit > licences,
+       ou les codes que tu enverras toi-même après chaque vente).
+  ===================================================================== */
+  var CONFIG = {
+    GUMROAD_URL: "",
+    ACCESS_CODES: []
+  };
+
+  var state = { hasPhoto: false, photoURL: null, metrics: null, answers: {}, result: null, premium: false };
+
+  /* ---------------- Questions ---------------- */
+  var QUESTIONS = [
+    { id: "teint", title: "Comment décrirais-tu ton teint ?", options: [
+      { v: "tres-clair", label: "Très clair", dot: "#f7dfca" },
+      { v: "clair", label: "Clair", dot: "#f0cdb0" },
+      { v: "moyen-clair", label: "Moyen clair", dot: "#e2b086" },
+      { v: "moyen", label: "Moyen", dot: "#cd9264" },
+      { v: "mat", label: "Mat", dot: "#a96f42" },
+      { v: "fonce", label: "Foncé", dot: "#7a4826" } ] },
+    { id: "veines", title: "Au poignet, tes veines sont plutôt…", options: [
+      { v: "vertes", label: "Vertes" },
+      { v: "bleues", label: "Bleues / violettes" },
+      { v: "mixte", label: "Difficile à dire" } ] },
+    { id: "bijoux", title: "Quels bijoux te vont le mieux au teint ?", options: [
+      { v: "or", label: "L'or", dot: "#d9a94f" },
+      { v: "argent", label: "L'argent", dot: "#c9ccd4" },
+      { v: "deux", label: "Les deux" } ] },
+    { id: "cheveux", title: "Ta couleur de cheveux naturelle ?", options: [
+      { v: "blond", label: "Blond", dot: "#e8cf9e" },
+      { v: "roux", label: "Roux", dot: "#b45a28" },
+      { v: "chatain", label: "Châtain", dot: "#8a5a33" },
+      { v: "brun", label: "Brun", dot: "#4c2c17" },
+      { v: "noir", label: "Noir", dot: "#1d1512" },
+      { v: "gris", label: "Gris / blanc", dot: "#d8d8d8" } ] },
+    { id: "yeux", title: "La couleur de tes yeux ?", options: [
+      { v: "bleu", label: "Bleu", dot: "#6d9ec4" },
+      { v: "vert", label: "Vert", dot: "#6f9e6a" },
+      { v: "noisette", label: "Noisette", dot: "#a97c46" },
+      { v: "marron", label: "Marron", dot: "#5d3a1e" },
+      { v: "noir", label: "Noir", dot: "#241a14" } ] },
+    { id: "soleil", title: "Au soleil, ta peau…", options: [
+      { v: "bronze", label: "Bronze facilement" },
+      { v: "brule", label: "Brûle d'abord, bronze peu" },
+      { v: "mixte", label: "Un peu des deux" } ] },
+    { id: "objectif", title: "Ton objectif principal ?", options: [
+      { v: "eclat", label: "Un teint plus éclatant" },
+      { v: "maquillage", label: "Réussir mon maquillage" },
+      { v: "couleurs", label: "Choisir mes couleurs (vêtements, cheveux)" } ] },
+    { id: "routine", title: "Combien de temps pour ta routine du matin ?", options: [
+      { v: "5", label: "5 minutes, express" },
+      { v: "10", label: "10 minutes" },
+      { v: "20", label: "20 minutes, je prends mon temps" } ] }
+  ];
+
+  var TEINT_DEPTH = { "tres-clair": 0, "clair": 1, "moyen-clair": 2, "moyen": 3, "mat": 4, "fonce": 5 };
+  var HAIR_DARK = { blond: 0.5, roux: 2, chatain: 2.6, brun: 4.2, noir: 5, gris: 0.4 };
+  var EYE_DARK = { bleu: 0.6, vert: 1.6, noisette: 2.6, marron: 4, noir: 5 };
+
+  /* ---------------- Saisons ---------------- */
+  var SEASONS = {
+    "printemps-clair": {
+      name: "Printemps Clair", temp: "chaud",
+      desc: "Teint lumineux et doré, contraste doux : tu rayonnes dans les teintes claires, chaudes et pleines de fraîcheur. Les couleurs trop sombres ou trop froides éteignent ton éclat naturel.",
+      palette: [["#f6c453","Jonquille"],["#f28c6b","Corail doux"],["#a8c686","Vert pomme"],["#7fc8bc","Turquoise clair"],["#f4a7b9","Rose poudré"],["#8ecae6","Bleu ciel chaud"],["#e2725b","Terracotta clair"],["#fdf0d5","Crème vanille"]],
+      avoid: [["#1c1c2e","Noir bleuté"],["#5b2333","Bordeaux froid"],["#8d99ae","Gris froid"],["#3a506b","Bleu marine dur"]],
+      metal: "Or clair ou or rose", lip: "Corail, pêche, rose chaud", blush: "Pêche ou corail doux" },
+    "printemps-chaud": {
+      name: "Printemps Chaud", temp: "chaud",
+      desc: "Une harmonie dorée et solaire : les couleurs chaudes et franches réveillent ton teint. Tu gagnes à éviter les teintes glacées qui grisent ton visage.",
+      palette: [["#e9c46a","Jaune doré"],["#e76f51","Corail vif"],["#90be6d","Vert prairie"],["#43aa8b","Turquoise"],["#f4a261","Abricot"],["#bc6c25","Camel"],["#dda15e","Miel"],["#fefae0","Ivoire chaud"]],
+      avoid: [["#22223b","Bleu nuit froid"],["#9a8c98","Mauve grisé"],["#4a4e69","Gris bleuté"],["#000000","Noir pur"]],
+      metal: "Or jaune", lip: "Corail, rouge orangé, caramel", blush: "Abricot ou corail" },
+    "printemps-lumineux": {
+      name: "Printemps Lumineux", temp: "chaud",
+      desc: "Contraste net entre tes cheveux et ton teint, avec une base chaude : les couleurs vives et claires te donnent un éclat immédiat. Les teintes ternes ou poudreuses te font paraître fatiguée.",
+      palette: [["#ffd60a","Jaune vif"],["#ff5d5d","Rouge corail"],["#06d6a0","Vert émeraude clair"],["#118ab2","Turquoise vif"],["#ef476f","Rose bonbon chaud"],["#f78c6b","Mandarine"],["#ffd6a5","Pêche lumineuse"],["#fff3e2","Blanc cassé chaud"]],
+      avoid: [["#6c757d","Gris moyen"],["#a26769","Vieux rose terne"],["#5e503f","Kaki terne"],["#403d39","Brun gris"]],
+      metal: "Or jaune ou or rose", lip: "Rouge corail, rose vif chaud", blush: "Corail lumineux" },
+    "ete-clair": {
+      name: "Été Clair", temp: "froid",
+      desc: "Teint délicat et rosé, contraste tout en douceur : les teintes claires et fraîches, légèrement poudrées, sont tes meilleures alliées. Les couleurs trop intenses prennent le dessus sur ton visage.",
+      palette: [["#a9d6e5","Bleu poudre"],["#f4acb7","Rose dragée"],["#b5c99a","Vert d'eau"],["#cdb4db","Lavande"],["#ffc8dd","Rose bonbon pâle"],["#8ecae6","Bleu ciel froid"],["#e5e5e5","Gris perle"],["#fff8ec","Blanc cassé froid"]],
+      avoid: [["#e76f51","Orange brûlé"],["#bc6c25","Camel"],["#000000","Noir pur"],["#ffd60a","Jaune vif"]],
+      metal: "Argent ou or blanc", lip: "Rose poudré, framboise douce", blush: "Rose pâle nacré" },
+    "ete-doux": {
+      name: "Été Doux", temp: "froid",
+      desc: "Harmonie feutrée et élégante : les couleurs froides, douces et légèrement grisées subliment ton teint. Évite les contrastes durs et les couleurs trop saturées qui durcissent tes traits.",
+      palette: [["#8ea8b8","Bleu grisé"],["#c48b9d","Vieux rose"],["#94a187","Sauge"],["#7d8597","Gris taupe"],["#b5838d","Rose fumé"],["#6d8ea0","Bleu ardoise doux"],["#a3b18a","Vert sauge clair"],["#e8e3da","Greige"]],
+      avoid: [["#ff7b00","Orange vif"],["#000000","Noir pur"],["#e9c46a","Jaune doré"],["#9d0208","Rouge franc"]],
+      metal: "Argent brossé ou or rose pâle", lip: "Vieux rose, mauve doux", blush: "Rose fumé" },
+    "ete-froid": {
+      name: "Été Froid", temp: "froid",
+      desc: "Base fraîche et rosée, regard net : les couleurs froides et claires à moyennes illuminent ton visage. Les teintes chaudes et terreuses, elles, te donnent l'air fatiguée.",
+      palette: [["#5e8ce6","Bleu roi doux"],["#d6336c","Framboise"],["#7fb069","Vert frais"],["#9d6bc4","Violet"],["#48cae4","Bleu azur"],["#e56b9f","Rose fuchsia doux"],["#adb5bd","Gris argent"],["#f8f9fa","Blanc pur doux"]],
+      avoid: [["#bc6c25","Camel"],["#e2725b","Terracotta"],["#dda15e","Miel"],["#606c38","Olive"]],
+      metal: "Argent", lip: "Framboise, rose froid", blush: "Rose froid" },
+    "automne-doux": {
+      name: "Automne Doux", temp: "chaud",
+      desc: "Chaleur feutrée et naturelle : les couleurs chaudes, douces et terreuses en version adoucie te vont à merveille. Les couleurs trop vives ou trop glacées cassent ton harmonie.",
+      palette: [["#c08552","Caramel doux"],["#b08968","Taupe chaud"],["#7f5539","Brun lait"],["#a3a380","Sauge chaud"],["#cb997e","Nude rosé"],["#936639","Moka"],["#d4a373","Sable"],["#ede0d4","Crème"]],
+      avoid: [["#000000","Noir pur"],["#5e8ce6","Bleu électrique"],["#ef476f","Fuchsia"],["#caf0f8","Bleu glacier"]],
+      metal: "Or mat ou bronze", lip: "Nude chaud, brun rosé", blush: "Terracotta douce" },
+    "automne-chaud": {
+      name: "Automne Chaud", temp: "chaud",
+      desc: "Une palette de terre et de feu : les couleurs chaudes, riches et profondes font ressortir l'or de ton teint. Les teintes froides et pâles, au contraire, te ternissent.",
+      palette: [["#bc6c25","Camel"],["#606c38","Olive"],["#9c6644","Brun cuivré"],["#e76f51","Terracotta"],["#dda15e","Miel"],["#7f5539","Chocolat lait"],["#a26769","Rose terre"],["#faedcd","Crème dorée"]],
+      avoid: [["#a9d6e5","Bleu poudre"],["#ffc8dd","Rose bonbon"],["#000000","Noir pur"],["#cdb4db","Lavande"]],
+      metal: "Or jaune ou cuivre", lip: "Terracotta, brun doré", blush: "Pêche brûlée" },
+    "automne-profond": {
+      name: "Automne Profond", temp: "chaud",
+      desc: "Contraste marqué et chaleur intense : les couleurs chaudes et profondes te donnent une présence incroyable. Les teintes pâles ou froides te font paraître éteinte.",
+      palette: [["#774936","Chocolat"],["#9c6644","Cuivre"],["#606c38","Olive profond"],["#bc4749","Rouge brique"],["#dda15e","Ocre"],["#386641","Vert forêt chaud"],["#6a040f","Bordeaux chaud"],["#f2cc8f","Sable doré"]],
+      avoid: [["#ffc8dd","Rose pâle"],["#a9d6e5","Bleu pastel"],["#e5e5e5","Gris clair"],["#cdb4db","Lilas"]],
+      metal: "Or antique ou bronze", lip: "Rouge brique, brun profond", blush: "Terracotta intense" },
+    "hiver-froid": {
+      name: "Hiver Froid", temp: "froid",
+      desc: "Base froide et regard intense : les couleurs franches, froides et saturées illuminent ton visage. Les teintes chaudes et poudreuses brouillent ton teint.",
+      palette: [["#4361ee","Bleu roi"],["#d90429","Rouge franc"],["#7209b7","Violet vif"],["#06d6a0","Émeraude"],["#f72585","Fuchsia"],["#14213d","Bleu nuit"],["#e5e5e5","Gris argent"],["#ffffff","Blanc pur"]],
+      avoid: [["#dda15e","Miel"],["#bc6c25","Camel"],["#cb997e","Nude rosé chaud"],["#a3a380","Sauge"]],
+      metal: "Argent ou platine", lip: "Rouge franc, fuchsia", blush: "Rose froid franc" },
+    "hiver-profond": {
+      name: "Hiver Profond", temp: "froid",
+      desc: "Profondeur et intensité : les couleurs froides et sombres, portées avec des touches franches, te donnent un port de reine. Les pastels chauds te font paraître fatiguée.",
+      palette: [["#14213d","Bleu nuit"],["#6a040f","Bordeaux froid"],["#370617","Prune sombre"],["#003049","Pétrole"],["#9d0208","Rouge sombre"],["#212529","Anthracite"],["#8d99ae","Gris acier"],["#ffffff","Blanc pur"]],
+      avoid: [["#f4a261","Abricot"],["#dda15e","Miel"],["#a3b18a","Sauge clair"],["#f6c453","Jaune pâle"]],
+      metal: "Argent ou or blanc", lip: "Bordeaux, prune, rouge sombre", blush: "Prune rosée" },
+    "hiver-lumineux": {
+      name: "Hiver Lumineux", temp: "froid",
+      desc: "Le contraste est ta signature : teint clair, traits nets, base froide. Les couleurs vives et glacées te donnent un éclat spectaculaire ; les teintes ternes te font disparaître.",
+      palette: [["#00b4d8","Bleu glacier vif"],["#f72585","Fuchsia"],["#7209b7","Violet électrique"],["#06d6a0","Émeraude glacée"],["#d90429","Rouge cerise"],["#03045e","Bleu électrique"],["#ced4da","Gris lumineux"],["#ffffff","Blanc pur"]],
+      avoid: [["#bc6c25","Camel"],["#a26769","Vieux rose terne"],["#606c38","Olive"],["#dda15e","Miel"]],
+      metal: "Argent brillant", lip: "Fuchsia, rouge cerise", blush: "Rose glacé" }
+  };
+</script>
+
+  <script>
+  "use strict";
+  function $(id) { return document.getElementById(id); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  /* ---------------- Navigation ---------------- */
+  function show(id) {
+    var screens = document.querySelectorAll(".screen");
+    for (var i = 0; i < screens.length; i++) screens[i].classList.remove("on");
+    $("screen-" + id).classList.add("on");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  $("cta-start").addEventListener("click", function () { show("photo"); });
+  $("cta-start-2").addEventListener("click", function () { show("photo"); });
+  var backs = document.querySelectorAll("[data-back]");
+  for (var b = 0; b < backs.length; b++) {
+    backs[b].addEventListener("click", function () { show(this.getAttribute("data-back")); });
+  }
+  $("prog-photo").style.width = "33%";
+  $("prog-quiz").style.width = "66%";
+
+  /* ---------------- Photo : analyse 100 % locale ---------------- */
+  $("file-input").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    if (!file) return;
+    if (state.photoURL) URL.revokeObjectURL(state.photoURL);
+    state.photoURL = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      $("preview-img").src = state.photoURL;
+      $("preview").hidden = false;
+      $("drop").classList.add("has-photo");
+      $("drop-empty").hidden = true;
+      state.hasPhoto = true;
+      state.metrics = analyzePixels(img);
+      var m = state.metrics;
+      var toneTxt = m.warmth > 0.16 ? "plutôt chaude (dorée)" : (m.warmth < 0.09 ? "plutôt froide (rosée)" : "neutre, entre chaud et froid");
+      $("photo-status").textContent = "Photo reçue ✓ — tonalité détectée : " + toneTxt + ", luminosité " + Math.round(m.lumPct) + " %. Tu peux continuer.";
+      $("btn-toquiz").disabled = false;
+      $("btn-nophoto").textContent = "Changer d'avis : sans photo";
+    };
+    img.onerror = function () { $("photo-status").textContent = "Cette image n'a pas pu être lue — essaie une autre photo."; };
+    img.src = state.photoURL;
+  });
+
+  function analyzePixels(img) {
+    var S = 220, c = document.createElement("canvas");
+    c.width = S; c.height = S;
+    var ctx = c.getContext("2d", { willReadFrequently: true });
+    var side = Math.min(img.naturalWidth, img.naturalHeight);
+    ctx.drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, S, S);
+    // Zone centrale du visage dans le carré : x 30–70 %, y 20–58 %
+    var x0 = Math.round(S * 0.30), x1 = Math.round(S * 0.70);
+    var y0 = Math.round(S * 0.20), y1 = Math.round(S * 0.58);
+    var data = ctx.getImageData(x0, y0, x1 - x0, y1 - y0).data;
+    var sr = 0, sg = 0, sb = 0, n = 0, lums = [];
+    for (var i = 0; i < data.length; i += 16) { // 1 pixel sur 4
+      var r = data[i], g = data[i + 1], bl = data[i + 2];
+      // Filtre "peau" : rouge dominant, écart rouge/bleu net
+      if (r > 55 && r > g && g >= bl - 8 && (r - bl) > 12) {
+        sr += r; sg += g; sb += bl; n++;
+        lums.push(0.2126 * r + 0.7152 * g + 0.0722 * bl);
+      }
+    }
+    if (n < 40) { // repli : toute la zone
+      sr = sg = sb = 0; n = 0; lums = [];
+      for (var j = 0; j < data.length; j += 16) {
+        sr += data[j]; sg += data[j + 1]; sb += data[j + 2]; n++;
+        lums.push(0.2126 * data[j] + 0.7152 * data[j + 1] + 0.0722 * data[j + 2]);
+      }
+    }
+    var R = sr / n, G = sg / n, B = sb / n;
+    var mean = lums.reduce(function (a, v) { return a + v; }, 0) / lums.length;
+    var variance = lums.reduce(function (a, v) { return a + (v - mean) * (v - mean); }, 0) / lums.length;
+    return {
+      r: R, g: G, b: B,
+      warmth: (R - B) / (R + B + 1),              // ~0.05 froid … ~0.25 chaud
+      lumPct: clamp(mean / 2.55, 0, 100),          // 0–100
+      homogPct: clamp(100 - Math.sqrt(variance) * 1.7, 8, 98)
+    };
+  }
+
+  $("btn-nophoto").addEventListener("click", function () {
+    state.hasPhoto = false; state.metrics = null;
+    show("quiz");
+  });
+  $("btn-toquiz").addEventListener("click", function () { show("quiz"); });
+
+  /* ---------------- Questionnaire ---------------- */
+  var quizBody = $("quiz-body");
+  QUESTIONS.forEach(function (q) {
+    var block = document.createElement("div");
+    block.className = "q-block";
+    var h = document.createElement("h3");
+    h.textContent = q.title;
+    block.appendChild(h);
+    var opts = document.createElement("div");
+    opts.className = "opts";
+    q.options.forEach(function (o) {
+      var btn = document.createElement("button");
+      btn.type = "button"; btn.className = "opt"; btn.setAttribute("data-q", q.id); btn.setAttribute("data-v", o.v);
+      if (o.dot) {
+        var d = document.createElement("span");
+        d.className = "dot"; d.style.background = o.dot;
+        btn.appendChild(d);
+      }
+      btn.appendChild(document.createTextNode(o.label));
+      btn.addEventListener("click", function () {
+        state.answers[q.id] = o.v;
+        var siblings = opts.querySelectorAll(".opt");
+        for (var i = 0; i < siblings.length; i++) siblings[i].classList.remove("sel");
+        btn.classList.add("sel");
+        $("quiz-error").style.display = "none";
+      });
+      opts.appendChild(btn);
+    });
+    block.appendChild(opts);
+    quizBody.appendChild(block);
+  });
+
+  $("btn-analyze").addEventListener("click", function () {
+    var missing = QUESTIONS.filter(function (q) { return !state.answers[q.id]; });
+    if (missing.length) {
+      $("quiz-error").style.display = "block";
+      $("quiz-error").scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    runAnalysis();
+  });
+
+  /* ---------------- Calcul des résultats ---------------- */
+  function computeResult() {
+    var a = state.answers, m = state.metrics;
+    var warm = 0;
+    if (a.veines === "vertes") warm += 2; else if (a.veines === "bleues") warm -= 2;
+    if (a.bijoux === "or") warm += 1.5; else if (a.bijoux === "argent") warm -= 1.5;
+    if (a.soleil === "bronze") warm += 0.5; else if (a.soleil === "brule") warm -= 0.5;
+    if (m) warm += clamp((m.warmth - 0.125) * 22, -2, 2);
+
+    var skinD = TEINT_DEPTH[a.teint];
+    var hairD = HAIR_DARK[a.cheveux];
+    var eyeD = EYE_DARK[a.yeux];
+    var depth = (skinD + hairD) / 2;                       // 0 clair … 5 profond
+    var contrast = Math.abs(hairD - skinD) + (eyeD - 2.5) * 0.35;
+
+    var seasonId;
+    if (warm >= 1) {
+      if (depth < 1.8) seasonId = contrast >= 2.2 ? "printemps-lumineux" : "printemps-clair";
+      else if (depth < 3.4) seasonId = contrast < 1.1 ? "automne-doux" : "printemps-chaud";
+      else seasonId = contrast >= 2 ? "automne-profond" : "automne-chaud";
+    } else if (warm <= -1) {
+      if (depth < 1.8) seasonId = contrast >= 2.2 ? "hiver-lumineux" : "ete-clair";
+      else if (depth < 3.4) seasonId = contrast < 1.1 ? "ete-doux" : "ete-froid";
+      else seasonId = contrast >= 2 ? "hiver-froid" : "hiver-profond";
+    } else {
+      if (depth < 1.8) seasonId = warm >= 0 ? "printemps-clair" : "ete-clair";
+      else if (depth < 3.4) seasonId = warm >= 0 ? "automne-doux" : "ete-doux";
+      else seasonId = warm >= 0 ? "automne-chaud" : "hiver-profond";
+    }
+
+    // Score d'éclat
+    var teintScore, homogScore, harmonyScore;
+    if (m) {
+      teintScore = clamp(52 + m.lumPct * 0.44, 50, 96);
+      homogScore = clamp(m.homogPct, 40, 97);
+    } else {
+      var seed = (a.teint.length * 7 + a.cheveux.length * 13 + a.yeux.length * 29) % 10;
+      teintScore = 66 + seed;
+      homogScore = 62 + ((seed * 3) % 12);
+    }
+    harmonyScore = clamp(64 + Math.min(30, Math.abs(warm) * 6.5), 60, 95);
+    var score = Math.round(teintScore * 0.38 + homogScore * 0.30 + harmonyScore * 0.32);
+    score = clamp(score, 48, 96);
+
+    return {
+      seasonId: seasonId, season: SEASONS[seasonId], warm: warm,
+      score: score,
+      bars: [
+        { label: "Luminosité du teint", val: Math.round(teintScore) },
+        { label: "Homogénéité", val: Math.round(homogScore) },
+        { label: "Harmonie des couleurs", val: Math.round(harmonyScore) }
+      ]
+    };
+  }
+
+  function runAnalysis() {
+    show("analyzing");
+    if (state.hasPhoto && state.photoURL) {
+      $("scan-img").src = state.photoURL;
+      $("scan-img").hidden = false;
+      $("scan-placeholder").style.display = "none";
+    }
+    var items = $("analyze-steps").querySelectorAll("li");
+    for (var i = 0; i < items.length; i++) items[i].classList.remove("done");
+    var idx = 0;
+    var timer = setInterval(function () {
+      if (idx < items.length) { items[idx].classList.add("done"); idx++; }
+      else {
+        clearInterval(timer);
+        state.result = computeResult();
+        renderResults();
+        setTimeout(function () { show("results"); }, 350);
+      }
+    }, 620);
+  }
+
+  /* ---------------- Rendu des résultats ---------------- */
+  function el(html) { var d = document.createElement("div"); d.innerHTML = html; return d.firstElementChild; }
+
+  function renderResults() {
+    var r = state.result, a = state.answers, s = r.season, m = state.metrics;
+    $("results-intro").textContent = state.hasPhoto
+      ? "Basé sur l'analyse de ta photo (faite sur ton appareil) et tes réponses."
+      : "Basé sur tes réponses — refais un scan avec photo pour une analyse plus fine.";
+
+    // Score
+    $("score-num").textContent = r.score;
+    $("gauge-arc").style.strokeDashoffset = (364.4 * (1 - r.score / 100)).toFixed(1);
+    $("score-verdict").textContent =
+      r.score >= 82 ? "Un très beau potentiel — quelques ajustements et tu rayonnes." :
+      r.score >= 68 ? "Une belle base, avec une vraie marge de progression." :
+      "Ton teint a besoin d'un coup de pouce : le plan ci-dessous est fait pour ça.";
+    var barsHtml = "";
+    r.bars.forEach(function (b) {
+      barsHtml += '<div class="bar-row"><div class="bar-top"><span>' + b.label + '</span><span>' + b.val + '</span></div><div class="bar"><i data-w="' + b.val + '"></i></div></div>';
+    });
+    $("score-bars").innerHTML = barsHtml;
+    $("score-note").textContent = state.hasPhoto
+      ? "Estimation calculée à partir de la luminosité et de l'homogénéité mesurées sur ta photo, croisées avec l'harmonie de tes couleurs naturelles."
+      : "Estimation indicative calculée à partir de tes réponses. Ajoute une photo pour mesurer la luminosité et l'homogénéité réelles de ton teint.";
+
+    // Saison
+    $("season-name").textContent = s.name;
+    $("season-desc").textContent = s.desc;
+    var sw = "";
+    s.palette.forEach(function (p) {
+      sw += '<div class="sw"><i style="background:' + p[0] + '"></i><span>' + p[1] + '</span></div>';
+    });
+    $("season-swatches").innerHTML = sw;
+    var av = "";
+    s.avoid.forEach(function (p) {
+      av += '<span class="av"><i style="background:' + p[0] + '"></i>' + p[1] + '</span>';
+    });
+    $("season-avoid").innerHTML = av;
+    $("fact-metal").textContent = s.metal;
+    $("fact-undertone").textContent = s.temp === "chaud" ? "Chaud (doré)" : "Froid (rosé)";
+    $("veil-season").textContent = s.name;
+
+    // Visage
+    $("face-sub").textContent = state.hasPhoto ? "Ce que ta photo révèle, point par point." : "D'après tes réponses — ajoute une photo pour des mesures précises.";
+    var lum = m ? Math.round(m.lumPct) : r.bars[0].val;
+    var hom = m ? Math.round(m.homogPct) : r.bars[1].val;
+    var chaleur = m ? Math.round(clamp(m.warmth * 400, 4, 98)) : (s.temp === "chaud" ? 78 : 24);
+    $("face-stats").innerHTML =
+      '<div class="face-stat"><b>' + lum + ' %</b><span>Luminosité du teint</span></div>' +
+      '<div class="face-stat"><b>' + hom + ' %</b><span>Homogénéité</span></div>' +
+      '<div class="face-stat"><b>' + chaleur + ' %</b><span>Chaleur du teint</span></div>';
+
+    var strengths = [], focus = [];
+    if (a.yeux === "bleu" || a.yeux === "vert") strengths.push("Des yeux clairs qui captent la lumière : un simple mascara suffit à les faire ressortir.");
+    else strengths.push("Un regard profond et intense, parfait pour les fards fumés dans tes teintes.");
+    if (a.cheveux === "roux") strengths.push("Une chevelure rousse rare et lumineuse — les teintes chaudes de ta palette la subliment.");
+    else if (s.temp === "chaud") strengths.push("Un sous-ton doré qui donne bonne mine dès que tu portes tes couleurs chaudes.");
+    else strengths.push("Un sous-ton rosé élégant, magnifié par les teintes froides et les finis nacrés.");
+    if (lum >= 60) strengths.push("Une luminosité de teint déjà au-dessus de la moyenne : c'est ta meilleure base.");
+    if (hom < 62) focus.push("Unifier le teint : c'est ton levier n° 1 (base lumineuse + correcteur ciblé, détail dans le plan complet).");
+    else focus.push("Entretenir l'homogénéité : exfoliation douce hebdomadaire et protection solaire quotidienne.");
+    if (lum < 55) focus.push("Booster l'éclat : sommeil, hydratation et un sérum éclat le soir — le protocole est dans le plan complet.");
+    else focus.push("Réveiller l'éclat les jours de fatigue : blush " + s.blush.toLowerCase() + " et touche d'enlumineur sur les pommettes.");
+    if (a.objectif === "couleurs") focus.push("Triez ta garde-robe avec ta palette : garde près du visage uniquement tes teintes de saison.");
+    else if (a.objectif === "maquillage") focus.push("Adapte tes teintes de maquillage à ta saison : rouge à lèvres " + s.lip.toLowerCase() + ".");
+    $("face-strengths").innerHTML = strengths.map(function (t) { return "<li>" + t + "</li>"; }).join("");
+    $("face-focus").innerHTML = focus.map(function (t) { return "<li>" + t + "</li>"; }).join("");
+
+    // Plan
+    var steps = buildPlan(r);
+    var freeHtml = "";
+    steps.forEach(function (st, i) {
+      freeHtml += "<li><span class='n'>" + (i + 1) + "</span><div><h4>" + st.title + "</h4><p>" +
+        (i < 2 ? st.detail : "Le détail de cette étape fait partie du plan complet.") + "</p></div></li>";
+    });
+    $("plan-free").innerHTML = freeHtml;
+    var fullHtml = "";
+    steps.forEach(function (st, i) {
+      fullHtml += "<li><span class='n'>" + (i + 1) + "</span><div><h4>" + st.title + "</h4><p>" + st.detail + "</p></div></li>";
+    });
+    $("plan-full").innerHTML = fullHtml;
+
+    // Routine
+    var routine = buildRoutine(a.routine, s);
+    $("routine-intro").textContent = "Calée sur les " + a.routine + " minutes que tu t'accordes le matin, avec les teintes de ta saison " + s.name + ".";
+    var rt = "";
+    routine.forEach(function (row) { rt += "<tr><td>" + row[0] + "</td><td>" + row[1] + "</td></tr>"; });
+    $("routine-body").innerHTML = rt;
+
+    // Produits (sélection générique par saison — liens affiliés à brancher)
+    var prods = buildProducts(s);
+    var pr = "";
+    prods.forEach(function (p) {
+      pr += '<div class="product"><div class="p-ic">' + p.icon + '</div><h4>' + p.name + '</h4><p>' + p.why + '</p><span class="aff-chip">Lien affilié — bientôt disponible</span></div>';
+    });
+    $("products").innerHTML = pr;
+
+    // Barres animées
+    setTimeout(function () {
+      var bars = $("score-bars").querySelectorAll(".bar i");
+      for (var i = 0; i < bars.length; i++) bars[i].style.width = bars[i].getAttribute("data-w") + "%";
+    }, 500);
+  }
+
+  function buildPlan(r) {
+    var s = r.season, a = state.answers;
+    var palNames = s.palette.slice(0, 4).map(function (p) { return p[1].toLowerCase(); }).join(", ");
+    return [
+      { title: "Jours 1–2 · Ta base lumière",
+        detail: "Nettoyage doux matin et soir, puis hydratation adaptée. Le matin, termine par une protection solaire : c'est elle qui protège ton score d'éclat sur la durée. Choisis un fond de teint ou une BB crème au sous-ton " + (s.temp === "chaud" ? "doré" : "rosé") + ", jamais plus foncé que ta mâchoire." },
+      { title: "Jours 3–4 · Tes couleurs alliées",
+        detail: "Près du visage, mise tout sur tes teintes de saison : " + palNames + ". Pour le maquillage : blush " + s.blush.toLowerCase() + ", rouge à lèvres " + s.lip.toLowerCase() + ", bijoux " + s.metal.toLowerCase() + "." },
+      { title: "Jours 5–6 · Le protocole éclat",
+        detail: "Exfoliation douce un soir sur deux (jamais deux produits exfoliants le même soir), sérum éclat à la vitamine C le matin avant ta crème, masque hydratant le 6e soir. Bois 1,5 L d'eau par jour et vise 7 h de sommeil : l'éclat se joue autant là que dans la salle de bain." },
+      { title: "Jour 7 · Ton maquillage signature",
+        detail: "Applique ta routine minutée (ci-dessous) en entier, prends une photo à la lumière du jour et compare avec ton selfie de départ. Ajuste une seule chose à la fois : soit le blush (" + s.blush.toLowerCase() + "), soit la bouche (" + s.lip.toLowerCase() + "), jamais tout en même temps." },
+      { title: "Semaines suivantes · Ancrer et trier",
+        detail: "Trie ta trousse et ta garde-robe avec ta palette : ce qui n'est pas dans tes teintes part loin du visage (bas, accessoires) ou sort. Refais un scan dans 30 jours pour mesurer ta progression et ajuster ton score d'éclat." }
+    ];
+  }
+
+  function buildRoutine(mins, s) {
+    var warm = s.temp === "chaud";
+    if (mins === "5") return [
+      ["0:00", "Base lumineuse au sous-ton " + (warm ? "doré" : "rosé") + ", appliquée aux doigts sur les zones centrales."],
+      ["1:30", "Correcteur uniquement sur les cernes et les rougeurs, tapoté au doigt."],
+      ["2:30", "Blush crème " + s.blush.toLowerCase() + " sur les pommettes, étiré vers les tempes."],
+      ["3:30", "Mascara noir, racines bien chargées."],
+      ["4:15", "Bouche : " + s.lip.toLowerCase() + ", au raisin ou en baume teinté. C'est prêt."]
+    ];
+    if (mins === "20") return [
+      ["0:00", "Base hydratante + protection solaire, 1 minute de massage pour réveiller le teint."],
+      ["3:00", "Fond de teint seconde peau au sous-ton " + (warm ? "doré" : "rosé") + ", éponge humide, du centre vers l'extérieur."],
+      ["7:00", "Correcteur ciblé, puis poudre libre uniquement sur la zone T."],
+      ["9:00", "Sourcils : brosse + gel teinté, sans redessiner."],
+      ["11:00", "Fards dans tes teintes (" + s.palette[1][1].toLowerCase() + ", " + s.palette[4][1].toLowerCase() + "), mascara en deux couches."],
+      ["15:00", "Blush " + s.blush.toLowerCase() + " + enlumineur sur le haut des pommettes."],
+      ["17:30", "Bouche " + s.lip.toLowerCase() + ", contour flouté au doigt pour un rendu naturel."]
+    ];
+    return [
+      ["0:00", "Base lumineuse au sous-ton " + (warm ? "doré" : "rosé") + ", éponge humide."],
+      ["2:00", "Correcteur sur les cernes et les ailes du nez."],
+      ["3:30", "Poudre libre légère sur la zone T si tu brilles vite."],
+      ["4:30", "Sourcils brossés + un fard neutre de ta palette en aplat sur la paupière."],
+      ["6:30", "Mascara généreux, haut et bas."],
+      ["8:00", "Blush " + s.blush.toLowerCase() + " sur les pommettes."],
+      ["9:00", "Bouche " + s.lip.toLowerCase() + ". Terminé, tu es dans tes couleurs."]
+    ];
+  }
+
+  function buildProducts(s) {
+    var warm = s.temp === "chaud";
+    var drop = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c2437b" stroke-width="2"><path d="M12 3c3.5 4.2 6 7.4 6 10a6 6 0 0 1-12 0c0-2.6 2.5-5.8 6-10z"/></svg>';
+    var circle = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c2437b" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>';
+    var paletteIc = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c2437b" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1.3" fill="#c2437b"/><circle cx="15" cy="10" r="1.3" fill="#b98a44"/><circle cx="12" cy="15" r="1.3" fill="#5f7d5a"/></svg>';
+    return [
+      { icon: drop, name: warm ? "Sérum éclat vitamine C" : "Sérum éclat niacinamide",
+        why: "Le geste du matin qui entretient ta luminosité entre deux scans, quel que soit ton type de peau." },
+      { icon: circle, name: "Fond de teint seconde peau — sous-ton " + (warm ? "doré" : "rosé"),
+        why: "La teinte se choisit sur la mâchoire, à la lumière du jour : c'est l'erreur n° 1 des teints ternes." },
+      { icon: paletteIc, name: "Blush crème " + s.blush.toLowerCase(),
+        why: "Ta teinte de saison exacte : l'effet bonne mine immédiat, sans risque de fausse note." }
+    ];
+  }
+
+  /* ---------------- Premium ---------------- */
+  function unlockPremium(demo) {
+    state.premium = true;
+    $("locked-zone").classList.add("unlocked");
+    $("premium-content").setAttribute("aria-hidden", "false");
+    $("code-msg").style.color = "var(--sage)";
+    $("code-msg").textContent = demo
+      ? "Mode démo actif : tu vois tout le contenu premium. Le jour de la mise en vente, seuls les acheteuses avec un code y auront accès."
+      : "Code accepté ✓ — ton plan complet est débloqué. Bonne lecture !";
+  }
+  $("btn-preview").addEventListener("click", function () { unlockPremium(true); });
+  $("btn-code").addEventListener("click", function () {
+    var code = $("code-input").value.trim().toUpperCase();
+    if (!code) { $("code-msg").style.color = "var(--rose-deep)"; $("code-msg").textContent = "Saisis d'abord le code reçu après ton achat."; return; }
+    if (CONFIG.ACCESS_CODES.indexOf(code) !== -1) unlockPremium(false);
+    else {
+      $("code-msg").style.color = "var(--rose-deep)";
+      $("code-msg").textContent = "Ce code n'est pas reconnu. Vérifie la saisie — le code figure dans l'e-mail de confirmation Gumroad.";
+    }
+  });
+  $("btn-buy").addEventListener("click", function () {
+    if (CONFIG.GUMROAD_URL) { window.open(CONFIG.GUMROAD_URL, "_blank", "noopener"); return; }
+    var note = $("pay-note");
+    note.innerHTML = "<strong>Les ventes ouvrent très bientôt.</strong> Le bouton d'achat sera relié à la page de paiement Gumroad du plan complet (9,90 €). En attendant, utilise l'aperçu de test ci-dessous pour voir tout le contenu premium.";
+    note.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  /* ---------------- Résumé téléchargeable ---------------- */
+  $("btn-download").addEventListener("click", function () {
+    var r = state.result; if (!r) return;
+    var s = r.season;
+    var lines = [
+      "MON ANALYSE SCAN BEAUTY UP",
+      "===========================",
+      "",
+      "Score d'éclat : " + r.score + " / 100",
+      r.bars.map(function (b) { return " - " + b.label + " : " + b.val; }).join("\n"),
+      "",
+      "Ma saison de couleurs : " + s.name,
+      s.desc,
+      "",
+      "Ma palette idéale :",
+      s.palette.map(function (p) { return " - " + p[1] + " (" + p[0] + ")"; }).join("\n"),
+      "",
+      "À éviter près du visage :",
+      s.avoid.map(function (p) { return " - " + p[1]; }).join("\n"),
+      "",
+      "Bijoux idéaux : " + s.metal,
+      "Rouge à lèvres : " + s.lip,
+      "Blush : " + s.blush,
+      "",
+      "Mon plan en 5 étapes :",
+      buildPlan(r).map(function (st, i) { return (i + 1) + ". " + st.title; }).join("\n"),
+      "",
+      state.premium ? "Plan complet : débloqué sur cet appareil." : "Plan complet (détails, routine minutée, sélection produits) : à débloquer dans l'application.",
+      "",
+      "Analyse esthétique indicative — ne remplace pas un avis médical ou dermatologique.",
+      "Scan Beauty Up — TikTok @scanbeautyup"
+    ];
+    var blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "mon-analyse-beauty-up.txt";
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  });
+
+  $("btn-restart").addEventListener("click", function () { window.location.reload(); });
+
+  /* ---------------- Pages légales ---------------- */
+  var legalBtns = document.querySelectorAll("[data-legal]");
+  for (var l = 0; l < legalBtns.length; l++) {
+    legalBtns[l].addEventListener("click", function () {
+      var target = $(this.getAttribute("data-legal"));
+      var wasOn = target.classList.contains("on");
+      var panels = document.querySelectorAll(".legal-panel");
+      for (var i = 0; i < panels.length; i++) panels[i].classList.remove("on");
+      if (!wasOn) { target.classList.add("on"); target.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    });
+  }
+  </script>
+</body>
+</html>
